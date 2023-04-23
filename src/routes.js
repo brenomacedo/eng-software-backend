@@ -1,7 +1,4 @@
 import { Router } from 'express';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const API_ENTRYPOINT = '/api/v1';
 const router = Router();
