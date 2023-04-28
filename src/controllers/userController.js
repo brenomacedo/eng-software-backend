@@ -1,5 +1,7 @@
 import User from '../models/User.js';
+import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
+import 'express-async-errors';
 
 class UserController {
   // Receive a request and a response.
@@ -52,7 +54,7 @@ class UserController {
 
     const user = await User.query().findById(id);
     if (!user) {
-      throw new Error('User not found');
+      throw new RequestError('Usuário não encontrado', 404);
     }
 
     await user.$query().patch({ name, email, description, birth_date });
@@ -70,7 +72,7 @@ class UserController {
     const { id } = req.params;
     const user = await User.query().findById(id);
     if (!user) {
-      throw new Error('user not found');
+      throw new RequestError('Usuário não encontrado', 404);
     }
     return res.json(user);
   }
@@ -80,7 +82,7 @@ class UserController {
     const { id } = req.params;
     const user = await User.query().findById(id);
     if (!user) {
-      throw new Error('user not found');
+      throw new RequestError('Usuário não encontrado', 404);
     }
     await user.$query().delete();
     return res.json({ message: 'User deleted' });

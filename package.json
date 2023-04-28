@@ -15,6 +15,7 @@
   "dependencies": {
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
     "knex": "^2.4.2",
     "objection": "^3.0.1",
     "pg": "^8.10.0",
