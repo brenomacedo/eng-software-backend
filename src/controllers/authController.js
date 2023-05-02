@@ -25,95 +25,83 @@ class AuthController {
       )
     });
 
-    try {
-      //validating the data that came from user
-      await schema.validate({
-        name,
-        email,
-        description,
-        birth_date,
-        password
-      });
+    //validating the data that came from user
+    await schema.validate({
+      name,
+      email,
+      description,
+      birth_date,
+      password
+    });
 
-      //creating a salt to hash the password
-      const salt = await bcrypt.genSalt(10);
-      //generating a hash from the password we received
-      const passwordHash = await bcrypt.hash(password, salt);
+    //creating a salt to hash the password
+    const salt = await bcrypt.genSalt(10);
+    //generating a hash from the password we received
+    const passwordHash = await bcrypt.hash(password, salt);
 
-      //inserting user in the database
-      const user = await User.query().insert({
-        name,
-        email,
-        description,
-        birth_date,
-        is_premium: false,
-        profile_pic: '',
-        password: passwordHash
-      });
+    //inserting user in the database
+    const user = await User.query().insert({
+      name,
+      email,
+      description,
+      birth_date,
+      is_premium: false,
+      profile_pic: '',
+      password: passwordHash
+    });
 
-      //here i create a jwt to return
-      //The payload containg the name, email and id of the user
-      //the key is in the env file
-      //the expiration date is 10 days
-      const acessToken = jwt.sign(
-        {
-          name: user.name,
-          email: user.email,
-          id: user.id,
-          is_premium: user.is_premium
-        },
-        process.env.JWT_KEY,
-        { expiresIn: '10d' }
-      );
+    //here i create a jwt to return
+    //The payload containg the name, email and id of the user
+    //the key is in the env file
+    //the expiration date is 10 days
+    const acessToken = jwt.sign(
+      {
+        name: user.name,
+        email: user.email,
+        id: user.id,
+        is_premium: user.is_premium
+      },
+      process.env.JWT_KEY,
+      { expiresIn: '10d' }
+    );
 
-      return res.status(200).json({ acessToken });
-    } catch (error) {
-      throw new RequestError('Um erro inesperado aconteceu', 400);
-    }
+    return res.status(200).json({ acessToken });
   }
 
   async login(req, res) {
     //taking email and password from the req
     const { email, password } = req.body;
 
-    try {
-      //trying to find some user with the same email
-      const user = await User.query().findOne({
-        email: email
-      });
+    //trying to find some user with the same email
+    const user = await User.query().findOne({
+      email: email
+    });
 
-      //if found someone, it will check if the password is matching
-      if (user) {
-        //comparing the password received to the hash stored in the db
-        const isPasswordMatching = await bcrypt.compare(
-          password,
-          user.password
+    //if found someone, it will check if the password is matching
+    if (user) {
+      //comparing the password received to the hash stored in the db
+      const isPasswordMatching = await bcrypt.compare(password, user.password);
+      //if the password is correct, return the acess token
+      if (isPasswordMatching) {
+        const acessToken = jwt.sign(
+          {
+            name: user.name,
+            email: user.email,
+            id: user.id,
+            is_premium: user.is_premium
+          },
+          process.env.JWT_KEY,
+          { expiresIn: '10d' }
         );
-        //if the password is correct, return the acess token
-        if (isPasswordMatching) {
-          const acessToken = jwt.sign(
-            {
-              name: user.name,
-              email: user.email,
-              id: user.id,
-              is_premium: user.is_premium
-            },
-            process.env.JWT_KEY,
-            { expiresIn: '10d' }
-          );
 
-          return res.status(200).json({ acessToken: acessToken });
-        } else {
-          //if the password is not correct throw an error
-          throw new RequestError('A senha digitada é incorreta', 401);
-        }
+        return res.status(200).json({ acessToken: acessToken });
       } else {
-        //if the query did not find the user throw an error
-        throw new RequestError('Usuário não encontrado', 401);
+        //if the password is not correct throw an error
+        throw new RequestError('A senha digitada é incorreta', 401);
       }
-    } catch (error) {
-      //throw an erro if something unexpected happen
-      throw new RequestError('Um erro inesperado aconteceu', 400);
+    } else {
+      //if the query did not find the user throw an error
+      throw new RequestError('Usuário não encontrado', 401);
     }
   }
 }
