@@ -6,39 +6,14 @@ import 'express-async-errors';
 class UserController {
   // Receive a request and a response.
 
-  // Create: create a new user
-  async create(req, res) {
-    const { name, email, description, birth_date } = req.body;
-
-    // Validate the User properties with YUP.
-    const schema = Yup.object().shape({
-      name: Yup.string('O formato do nome é inválido.').required(
-        'O nome é obrigatório.'
-      ),
-      email: Yup.string('O formato do email é inválido.')
-        .required('O email é obrigatório.')
-        .email('O formato do email é inválido.'),
-      description: Yup.string('O formato do descrição é inválido.'),
-      birth_date: Yup.date().required('A data de nascimento é obrigatória.')
-    });
-
-    await schema.validate({ name, email, description, birth_date });
-
-    const user = await User.query().insert({
-      name,
-      email,
-      description,
-      birth_date,
-      is_premium: false,
-      profile_pic: ''
-    });
-    return res.json(user);
-  }
-
   // Update: edit the user
   async update(req, res) {
     const { id } = req.params;
     const { name, email, description, birth_date } = req.body;
+
+    if (req.userId !== Number(id)) {
+      throw new RequestError('Operação não autorizada.', 403);
+    }
 
     // Validate the User properties with YUP.
     const schema = Yup.object().shape({
@@ -58,12 +33,19 @@ class UserController {
     }
 
     await user.$query().patch({ name, email, description, birth_date });
+
+    delete user.password;
     return res.json(user);
   }
 
   // Index: list all users
   async index(req, res) {
     const users = await User.query();
+
+    for (const user of users) {
+      delete user.password;
+    }
+
     return res.json(users);
   }
 
@@ -74,12 +56,19 @@ class UserController {
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);
     }
+
+    delete user.password;
     return res.json(user);
   }
 
   // Delete: delete a user by ID
   async delete(req, res) {
     const { id } = req.params;
+
+    if (req.userId !== Number(id)) {
+      throw new RequestError('Operação não autorizada.', 403);
+    }
+
     const user = await User.query().findById(id);
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);
