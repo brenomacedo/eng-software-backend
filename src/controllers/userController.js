@@ -11,6 +11,10 @@ class UserController {
     const { id } = req.params;
     const { name, email, description, birth_date } = req.body;
 
+    if (req.userId !== Number(id)) {
+      throw new RequestError('Operação não autorizada.', 403);
+    }
+
     // Validate the User properties with YUP.
     const schema = Yup.object().shape({
       name: Yup.string('O formato do nome é inválido.'),
@@ -29,12 +33,19 @@ class UserController {
     }
 
     await user.$query().patch({ name, email, description, birth_date });
+
+    delete user.password;
     return res.json(user);
   }
 
   // Index: list all users
   async index(req, res) {
     const users = await User.query();
+
+    for (const user of users) {
+      delete user.password;
+    }
+
     return res.json(users);
   }
 
@@ -45,12 +56,19 @@ class UserController {
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);
     }
+
+    delete user.password;
     return res.json(user);
   }
 
   // Delete: delete a user by ID
   async delete(req, res) {
     const { id } = req.params;
+
+    if (req.userId !== Number(id)) {
+      throw new RequestError('Operação não autorizada.', 403);
+    }
+
     const user = await User.query().findById(id);
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);

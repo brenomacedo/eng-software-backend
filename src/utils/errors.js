@@ -1,4 +1,7 @@
 import { ValidationError } from 'yup';
+import jwt from 'jsonwebtoken';
+
+const { JsonWebTokenError, TokenExpiredError } = jwt;
 
 export class RequestError extends Error {
   constructor(message, statusCode) {
@@ -17,10 +20,17 @@ export const errorHandler = (err, _req, res, _next) => {
     return res.status(403).json({
       error: err.errors[0]
     });
+  } else if (err instanceof JsonWebTokenError) {
+    return res.status(401).json({
+      error: 'Não autorizado'
+    });
+  } else if (err instanceof TokenExpiredError) {
+    return res.status(401).json({
+      error: 'Sessão expirada, realize o login novamente'
+    });
   } else {
     return res.status(400).json({
-      error:
-        'Ocorreu um erro desconhecido, por favor, contate os desenvolvedores'
+      error: err
     });
   }
 };

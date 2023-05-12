@@ -7,6 +7,15 @@ import 'express-async-errors';
 
 class AuthController {
   // Create: create a new user
+
+  // if the user token is valid, just return the
+  // authenticated user
+  async auth(req, res) {
+    const user = await User.query().findById(req.userId);
+    delete user.password;
+    return res.status(200).json(user);
+  }
+
   async signup(req, res) {
     const { name, email, description, birth_date, password } = req.body;
 
@@ -34,6 +43,14 @@ class AuthController {
       password
     });
 
+    const userWithInputedEmail = await User.query().findOne({ email });
+    if (userWithInputedEmail) {
+      throw new RequestError(
+        'Já existe um usuário cadastrado com esse email!',
+        409
+      );
+    }
+
     //creating a salt to hash the password
     const salt = await bcrypt.genSalt(10);
     //generating a hash from the password we received
@@ -54,18 +71,15 @@ class AuthController {
     //The payload containg the name, email and id of the user
     //the key is in the env file
     //the expiration date is 10 days
-    const acessToken = jwt.sign(
+    const accessToken = jwt.sign(
       {
-        name: user.name,
-        email: user.email,
-        id: user.id,
-        is_premium: user.is_premium
+        id: user.id
       },
       process.env.JWT_KEY,
       { expiresIn: '10d' }
     );
 
-    return res.status(200).json({ acessToken });
+    return res.status(200).json({ accessToken });
   }
 
   async login(req, res) {
@@ -83,18 +97,15 @@ class AuthController {
       const isPasswordMatching = await bcrypt.compare(password, user.password);
       //if the password is correct, return the acess token
       if (isPasswordMatching) {
-        const acessToken = jwt.sign(
+        const accessToken = jwt.sign(
           {
-            name: user.name,
-            email: user.email,
-            id: user.id,
-            is_premium: user.is_premium
+            id: user.id
           },
           process.env.JWT_KEY,
           { expiresIn: '10d' }
         );
 
-        return res.status(200).json({ acessToken: acessToken });
+        return res.status(200).json({ accessToken });
       } else {
         //if the password is not correct throw an error
         throw new RequestError('A senha digitada é incorreta', 401);
