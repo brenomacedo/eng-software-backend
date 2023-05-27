@@ -1,5 +1,7 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+import preferenceRoutes from './routes/preferenceRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
 import { errorHandler } from './utils/errors.js';
 import 'express-async-errors';
 import './database/index.js';
@@ -11,6 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(API_ENTRYPOINT, userRoutes);
+app.use(API_ENTRYPOINT, preferenceRoutes);
+app.use(API_ENTRYPOINT, eventRoutes);
 
 app.use(errorHandler);
 

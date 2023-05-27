@@ -87,9 +87,14 @@ class AuthController {
     const { email, password } = req.body;
 
     //trying to find some user with the same email
-    const user = await User.query().findOne({
-      email: email
-    });
+    const user = await User.query()
+      .findOne({
+        email: email
+      })
+      .withGraphFetched({
+        preferences: true,
+        events: true
+      });
 
     //if found someone, it will check if the password is matching
     if (user) {
@@ -105,7 +110,8 @@ class AuthController {
           { expiresIn: '10d' }
         );
 
-        return res.status(200).json({ accessToken });
+        delete user.password;
+        return res.status(200).json({ accessToken, user });
       } else {
         //if the password is not correct throw an error
         throw new RequestError('A senha digitada é incorreta', 401);

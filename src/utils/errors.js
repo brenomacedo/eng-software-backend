@@ -29,8 +29,9 @@ export const errorHandler = (err, _req, res, _next) => {
       error: 'Sessão expirada, realize o login novamente'
     });
   } else {
+    console.error(err);
     return res.status(400).json({
-      error: err
+      error: 'Ocorreu um erro'
     });
   }
 };

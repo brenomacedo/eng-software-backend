@@ -1,4 +1,6 @@
 import { Model } from 'objection';
+import Category from './Category.js';
+import Event from './Event.js';
 
 class User extends Model {
   static get tableName() {
@@ -21,6 +23,29 @@ class User extends Model {
       }
     };
   }
+
+  static relationMappings = () => ({
+    preferences: {
+      relation: Model.ManyToManyRelation,
+      modelClass: Category,
+      join: {
+        from: 'users.id',
+        to: 'categories.id',
+        through: {
+          from: 'users_categories.user_id',
+          to: 'users_categories.category_id'
+        }
+      }
+    },
+    events: {
+      relation: Model.HasManyRelation,
+      modelClass: Event,
+      join: {
+        from: 'users.id',
+        to: 'events.user_id'
+      }
+    }
+  });
 }
 
 export default User;
