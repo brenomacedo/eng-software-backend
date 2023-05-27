@@ -1,5 +1,6 @@
 import { Model } from 'objection';
 import User from './User.js';
+import Request from './Request.js';
 
 class Event extends Model {
   static get tableName() {
@@ -24,13 +25,21 @@ class Event extends Model {
   }
 
   static relationMappings = () => ({
-    users: {
+    user: {
       join: {
         from: 'events.user_id',
         to: 'users.id'
       },
       modelClass: User,
       relation: Model.BelongsToOneRelation
+    },
+    requests: {
+      join: {
+        from: 'events.id',
+        to: 'requests.event_id'
+      },
+      modelClass: Request,
+      relation: Model.HasManyRelation
     }
   });
 }

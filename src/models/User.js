@@ -1,6 +1,7 @@
 import { Model } from 'objection';
 import Category from './Category.js';
 import Event from './Event.js';
+import Request from './Request.js';
 
 class User extends Model {
   static get tableName() {
@@ -43,6 +44,14 @@ class User extends Model {
       join: {
         from: 'users.id',
         to: 'events.user_id'
+      }
+    },
+    requests: {
+      relation: Model.HasManyRelation,
+      modelClass: Request,
+      join: {
+        from: 'users.id',
+        to: 'requests.user_id'
       }
     }
   });

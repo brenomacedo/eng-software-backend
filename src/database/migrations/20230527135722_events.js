@@ -10,7 +10,13 @@ export function up(knex) {
     table.string('location').notNullable();
     table.float('latitude').notNullable();
     table.float('longitude').notNullable();
-    table.integer('user_id').references('id').inTable('users').notNullable();
+    table
+      .integer('user_id')
+      .references('id')
+      .inTable('users')
+      .notNullable()
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE');
   });
 }
 

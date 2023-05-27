@@ -92,6 +92,24 @@ class EventController {
     return res.status(200).json(nearestEvents);
   }
 
+  async indexUserEvents(req, res) {
+    const userId = req.userId;
+    const events = await Event.query()
+      .where({ user_id: userId })
+      .withGraphFetched({
+        requests: {
+          user: true
+        }
+      });
+
+    for (const eventKey in events) {
+      for (const requestKey in events[eventKey].requests) {
+        delete events[eventKey].requests[requestKey].user.password;
+      }
+    }
+    return res.status(200).json(events);
+  }
+
   async update(req, res) {
     const { title, description, location, latitude, longitude } = req.body;
     const id = Number(req.params.id);

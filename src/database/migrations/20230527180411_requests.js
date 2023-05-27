@@ -3,8 +3,11 @@
  * @returns { Promise<void> }
  */
 export function up(knex) {
-  return knex.schema.createTable('users_categories', function (table) {
+  return knex.schema.createTable('requests', function (table) {
     table.increments('id').primary();
+    table.string('message').notNullable();
+    table.enum('status', ['PENDING', 'ACCEPTED', 'DENIED']).notNullable();
+
     table
       .integer('user_id')
       .references('id')
@@ -13,12 +16,14 @@ export function up(knex) {
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
     table
-      .integer('category_id')
+      .integer('event_id')
       .references('id')
-      .inTable('categories')
+      .inTable('events')
       .notNullable()
       .onDelete('CASCADE')
       .onUpdate('CASCADE');
+
+    table.timestamps(true, true);
   });
 }
 
@@ -27,5 +32,5 @@ export function up(knex) {
  * @returns { Promise<void> }
  */
 export function down(knex) {
-  return knex.schema.dropTable('users_categories');
+  return knex.schema.dropTable('events');
 }
