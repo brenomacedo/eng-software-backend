@@ -26,8 +26,24 @@ class DistanceCalculator {
 
 class EventController {
   async create(req, res) {
-    const { title, description, location, latitude, longitude } = req.body;
-    const data = { title, description, location, latitude, longitude };
+    const {
+      title,
+      description,
+      location,
+      latitude,
+      longitude,
+      start_time,
+      end_time
+    } = req.body;
+    const data = {
+      title,
+      description,
+      location,
+      latitude,
+      longitude,
+      start_time,
+      end_time
+    };
     const userId = req.userId;
 
     const schema = Yup.object().shape({
@@ -111,7 +127,15 @@ class EventController {
   }
 
   async update(req, res) {
-    const { title, description, location, latitude, longitude } = req.body;
+    const {
+      title,
+      description,
+      location,
+      latitude,
+      longitude,
+      start_time,
+      end_time
+    } = req.body;
     const id = Number(req.params.id);
     const userId = req.userId;
 
@@ -145,7 +169,9 @@ class EventController {
       description,
       location,
       latitude,
-      longitude
+      longitude,
+      start_time,
+      end_time
     });
 
     return res.status(200).json({ message: 'Evento atualizado' });

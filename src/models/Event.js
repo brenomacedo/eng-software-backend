@@ -10,7 +10,15 @@ class Event extends Model {
   static get jsonSchema() {
     return {
       type: 'object',
-      required: ['title', 'location', 'latitude', 'longitude', 'user_id'],
+      required: [
+        'title',
+        'location',
+        'latitude',
+        'longitude',
+        'user_id',
+        'start_time',
+        'end_time'
+      ],
 
       properties: {
         id: { type: 'integer' },
@@ -19,6 +27,8 @@ class Event extends Model {
         location: { type: 'string' },
         latitude: { type: 'number' },
         longitude: { type: 'number' },
+        start_time: { type: 'string' },
+        end_time: { type: 'string' },
         user_id: { type: 'integer' }
       }
     };
