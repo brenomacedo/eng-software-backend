@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(API_ENTRYPOINT, userRoutes, addressRoutes);
+app.use(API_ENTRYPOINT, addressRoutes);
 app.use(API_ENTRYPOINT, userRoutes);
 app.use(API_ENTRYPOINT, preferenceRoutes);
 app.use(API_ENTRYPOINT, eventRoutes);
