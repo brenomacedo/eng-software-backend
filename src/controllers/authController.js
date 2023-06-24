@@ -62,7 +62,7 @@ class AuthController {
     const passwordHash = await bcrypt.hash(password, salt);
 
     //inserting user in the database
-    const user = await User.query().insert({
+    const user = await User.query().insertAndFetch({
       name,
       email,
       description,
@@ -71,6 +71,7 @@ class AuthController {
       profile_pic: '',
       password: passwordHash
     });
+    delete user.password;
 
     //here i create a jwt to return
     //The payload containg the name, email and id of the user
@@ -84,7 +85,7 @@ class AuthController {
       { expiresIn: '10d' }
     );
 
-    return res.status(200).json({ accessToken });
+    return res.status(200).json({ accessToken, user });
   }
 
   async login(req, res) {
