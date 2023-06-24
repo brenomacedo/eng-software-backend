@@ -11,7 +11,12 @@ class AuthController {
   // if the user token is valid, just return the
   // authenticated user
   async auth(req, res) {
-    const user = await User.query().findById(req.userId);
+    const user = await User.query().findById(req.userId).withGraphFetched({
+      preferences: true,
+      events: true,
+      requests: true,
+      address: true
+    });
     delete user.password;
     return res.status(200).json(user);
   }
