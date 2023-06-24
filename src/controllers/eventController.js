@@ -33,7 +33,8 @@ class EventController {
       latitude,
       longitude,
       start_time,
-      end_time
+      end_time,
+      type
     } = req.body;
     const data = {
       title,
@@ -42,7 +43,8 @@ class EventController {
       latitude,
       longitude,
       start_time,
-      end_time
+      end_time,
+      type
     };
     const userId = req.userId;
 
@@ -75,6 +77,7 @@ class EventController {
   }
 
   async indexNearestEvents(req, res) {
+    const user_id = req.userId;
     const distance = req.query.distance;
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
@@ -92,7 +95,7 @@ class EventController {
     });
     await schema.validate({ distance, latitude, longitude });
 
-    const events = await Event.query();
+    const events = await Event.query().whereNot({ user_id });
 
     const nearestEvents = events.filter(event => {
       const distanceThreshold = DistanceCalculator.getDistanceFromLatLonInKm(
