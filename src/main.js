@@ -5,12 +5,14 @@ import preferenceRoutes from './routes/preferenceRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import { errorHandler } from './utils/errors.js';
+import cors from 'cors';
 import 'express-async-errors';
 import './database/index.js';
 
 const API_ENTRYPOINT = '/api/v1';
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -94,7 +94,8 @@ class AuthController {
       .withGraphFetched({
         preferences: true,
         events: true,
-        requests: true
+        requests: true,
+        address: true
       });
 
     //if found someone, it will check if the password is matching
