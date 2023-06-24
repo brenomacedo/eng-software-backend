@@ -23,8 +23,6 @@ export async function seed(knex) {
     { name: 'Corrida' },
     { name: 'Bicicleta' },
     { name: 'Ginástica' },
-    { name: 'Bicicleta' },
-    { name: 'Ginástica' },
     { name: 'Zumba' },
     { name: 'Tênis' },
     { name: 'Tênis de Praia' },
