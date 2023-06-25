@@ -95,7 +95,13 @@ class EventController {
     });
     await schema.validate({ distance, latitude, longitude });
 
-    const events = await Event.query().whereNot({ user_id });
+    let events;
+
+    if (user_id) {
+      events = await Event.query().whereNot({ user_id });
+    } else {
+      events = await Event.query();
+    }
 
     const nearestEvents = events.filter(event => {
       const distanceThreshold = DistanceCalculator.getDistanceFromLatLonInKm(
