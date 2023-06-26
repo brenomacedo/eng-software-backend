@@ -148,6 +148,8 @@ class EventController {
     const id = Number(req.params.id);
     const userId = req.userId;
 
+    console.log("cheguei aquiii")
+
     const schema = Yup.object().shape({
       title: Yup.string('Formato do título inválido'),
       description: Yup.string('Formato da descrição inválida'),
@@ -202,6 +204,14 @@ class EventController {
 
     await eventToDelete.$query().delete();
     return res.status(200).json({ message: 'Evento deletado' });
+  }
+
+  async search(req, res) {
+    const title = req.params.title;
+    const userId = Number(req.params.userId);
+    const eventsFound = await Event.query().select('*').where('title', 'ilike', `%${title}%`).where('user_id','!=',userId);
+
+    return res.status(200).json(eventsFound);
   }
 }
 

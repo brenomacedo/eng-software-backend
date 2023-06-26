@@ -2,6 +2,7 @@ import Request from '../models/Request.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
 import 'express-async-errors';
+import Event from '../models/Event.js';
 
 class RequestController {
   async create(req, res) {
@@ -68,6 +69,13 @@ class RequestController {
     await requestDetails.$query().patch({ status: 'ACCEPTED' });
 
     return res.status(200).json({ message: 'Request successfuly updated' });
+  }
+
+  async searchRequests(req, res) {
+    const userId = Number(req.userId);
+    const userRequests = await Request.query().select('*').joinRelated('event').where('requests.user_id', userId);
+    //console.log(userRequests)
+    return res.status(200).json(userRequests);
   }
 }
 
