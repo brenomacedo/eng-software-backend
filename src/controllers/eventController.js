@@ -148,7 +148,7 @@ class EventController {
     const id = Number(req.params.id);
     const userId = req.userId;
 
-    console.log("cheguei aquiii")
+    console.log(title)
 
     const schema = Yup.object().shape({
       title: Yup.string('Formato do título inválido'),
@@ -210,6 +210,15 @@ class EventController {
     const title = req.params.title;
     const userId = Number(req.params.userId);
     const eventsFound = await Event.query().select('*').where('title', 'ilike', `%${title}%`).where('user_id','!=',userId);
+
+    return res.status(200).json(eventsFound);
+  }
+
+  async searchAll(req, res) {
+    const title = req.params.title;
+    const eventsFound = await Event.query().select('*').where('title', 'ilike', `%${title}%`);
+
+    
 
     return res.status(200).json(eventsFound);
   }

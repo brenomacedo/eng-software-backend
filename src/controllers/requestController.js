@@ -41,6 +41,8 @@ class RequestController {
     const userId = req.userId;
     const { answer } = req.body;
 
+    console.log('a res',answer)
+
     const schema = Yup.object().shape({
       answer: Yup.string('A resposta é obrigatória').oneOf(
         ['ACCEPTED', 'DENIED'],
@@ -50,6 +52,8 @@ class RequestController {
 
     await schema.validate({ answer });
 
+
+      
     const requestDetails = await Request.query()
       .findById(requestId)
       .withGraphFetched({
@@ -66,7 +70,9 @@ class RequestController {
       throw new RequestError('Não autorizado', 401);
     }
 
-    await requestDetails.$query().patch({ status: 'ACCEPTED' });
+    console.log("asdlakjsdaklskjdlk")
+
+    await requestDetails.$query().patch({ status: answer });
 
     return res.status(200).json({ message: 'Request successfuly updated' });
   }
@@ -76,6 +82,13 @@ class RequestController {
     const userRequests = await Request.query().select('*').joinRelated('event').where('requests.user_id', userId);
     //console.log(userRequests)
     return res.status(200).json(userRequests);
+  }
+
+  async userEventRequests(req, res) {
+    const eventId = Number(req.params.id);
+    const userId = Number(req.userId);
+    const requests = await Request.query().select('requests.id', 'message','name', 'status').joinRelated('user').where('requests.event_id', eventId)
+    return res.status(200).json(requests);
   }
 }
 
