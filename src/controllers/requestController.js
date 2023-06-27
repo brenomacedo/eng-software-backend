@@ -70,7 +70,7 @@ class RequestController {
       throw new RequestError('Não autorizado', 401);
     }
 
-    console.log("asdlakjsdaklskjdlk")
+
 
     await requestDetails.$query().patch({ status: answer });
 
@@ -80,7 +80,7 @@ class RequestController {
   async searchRequests(req, res) {
     const userId = Number(req.userId);
     const userRequests = await Request.query().select('*').joinRelated('event').where('requests.user_id', userId);
-    //console.log(userRequests)
+   
     return res.status(200).json(userRequests);
   }
 
