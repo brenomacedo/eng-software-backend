@@ -2,7 +2,7 @@ import Request from '../models/Request.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
 import 'express-async-errors';
-import Event from '../models/Event.js';
+//import Event from '../models/Event.js';
 
 class RequestController {
   async create(req, res) {
@@ -41,7 +41,7 @@ class RequestController {
     const userId = req.userId;
     const { answer } = req.body;
 
-    console.log('a res',answer)
+    console.log('a res', answer);
 
     const schema = Yup.object().shape({
       answer: Yup.string('A resposta é obrigatória').oneOf(
@@ -52,8 +52,6 @@ class RequestController {
 
     await schema.validate({ answer });
 
-
-      
     const requestDetails = await Request.query()
       .findById(requestId)
       .withGraphFetched({
@@ -70,7 +68,7 @@ class RequestController {
       throw new RequestError('Não autorizado', 401);
     }
 
-    console.log("asdlakjsdaklskjdlk")
+    console.log('asdlakjsdaklskjdlk');
 
     await requestDetails.$query().patch({ status: answer });
 
@@ -79,15 +77,21 @@ class RequestController {
 
   async searchRequests(req, res) {
     const userId = Number(req.userId);
-    const userRequests = await Request.query().select('*').joinRelated('event').where('requests.user_id', userId);
+    const userRequests = await Request.query()
+      .select('*')
+      .joinRelated('event')
+      .where('requests.user_id', userId);
     //console.log(userRequests)
     return res.status(200).json(userRequests);
   }
 
   async userEventRequests(req, res) {
     const eventId = Number(req.params.id);
-    const userId = Number(req.userId);
-    const requests = await Request.query().select('requests.id', 'message','name', 'status').joinRelated('user').where('requests.event_id', eventId)
+    //const userId = Number(req.userId);
+    const requests = await Request.query()
+      .select('requests.id', 'message', 'name', 'status')
+      .joinRelated('user')
+      .where('requests.event_id', eventId);
     return res.status(200).json(requests);
   }
 }
