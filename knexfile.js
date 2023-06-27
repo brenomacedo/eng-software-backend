@@ -1,6 +1,9 @@
 // Update with your config settings.
 import dotenv from 'dotenv';
-dotenv.config();
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
@@ -14,7 +17,8 @@ export default {
       port: process.env.DB_PORT,
       user: process.env.DB_USER,
       database: process.env.DB_DATABASE,
-      password: process.env.DB_PASSWORD
+      password: process.env.DB_PASSWORD,
+      ssl: { rejectUnauthorized: false }
     },
     migrations: {
       tableName: 'knex_migrations',
