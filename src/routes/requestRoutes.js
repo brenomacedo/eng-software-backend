@@ -4,7 +4,7 @@ import auth from '../middlewares/auth.js';
 
 const router = new Router();
 
-router.get('/request/:id', auth, requestController.userEventRequests)
+router.get('/request/all/:id', auth, requestController.userEventRequests)
 router.get('/request/me', auth, requestController.searchRequests)
 router.post('/request', auth, requestController.create);
 router.patch('/request/:id', auth, requestController.respond);

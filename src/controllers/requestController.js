@@ -68,8 +68,6 @@ class RequestController {
       throw new RequestError('Não autorizado', 401);
     }
 
-    console.log('asdlakjsdaklskjdlk');
-
     await requestDetails.$query().patch({ status: answer });
 
     return res.status(200).json({ message: 'Request successfuly updated' });
