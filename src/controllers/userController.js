@@ -5,6 +5,7 @@ import { RequestError } from '../utils/errors.js';
 import nodemailer from 'nodemailer';
 import * as Yup from 'yup';
 import 'express-async-errors';
+import nodemailer from 'nodemailer';
 
 class UserController {
   // Receive a request and a response.
