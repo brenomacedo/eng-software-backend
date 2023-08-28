@@ -3,6 +3,7 @@ import PasswordToken from '../models/PasswordToken.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
 import 'express-async-errors';
+import nodemailer from 'nodemailer';
 
 class UserController {
   // Receive a request and a response.
@@ -80,10 +81,35 @@ class UserController {
 
   async recoverPassword(req, res) {
     var email = req.body.email;
-
     var result = await PasswordToken.create(email);
+
     if (result.status) {
       //MANDAR EMAIL
+      let transporter = nodemailer.createTransporter({
+        host: 'smtp.gmail.com.',
+        port: 587,
+        secure: true,
+        auth: {
+          user: 'renanxmarques@alu.ufc.br'
+          //pass: //senha
+        }
+      });
+
+      transporter
+        .sendMail({
+          from: 'Pick a Pal <renanxmarques@alu.ufc.br>',
+          to: '96.twistedmint.69',
+          subject: 'Recuperação de senha - Pick a Pal',
+          text: 'Clique nesse link para redefinir sua senha: ',
+          html: "<a href: 'teste.com'>"
+        })
+        .then(message => {
+          console.log(message);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+
       res.status(200);
       res.send('' + result.token);
     } else {
