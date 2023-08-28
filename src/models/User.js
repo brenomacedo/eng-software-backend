@@ -4,6 +4,7 @@ import Event from './Event.js';
 import Request from './Request.js';
 import Address from './Address.js';
 import UserRating from './UserRating.js';
+import PasswordToken from './PasswordToken.js';
 
 class User extends Model {
   static get tableName() {
@@ -71,8 +72,33 @@ class User extends Model {
       },
       relation: Model.HasManyRelation,
       modelClass: UserRating
+    },
+    passwordToken: {
+      relation: Model.HasOneRelation,
+      modelClass: PasswordToken,
+      join: {
+        from: 'users.id',
+        to: 'passwordtokens.user_id'
+      }
     }
   });
+
+  static async findByEmail(email) {
+    try {
+      const result = await this.query()
+        .select('id', 'email', 'role', 'name') // Seleção específica de colunas
+        .findOne({ email });
+
+      if (result.length > 0) {
+        return result[0];
+      } else {
+        return undefined;
+      }
+    } catch (err) {
+      console.log(err);
+      return undefined;
+    }
+  }
 }
 
 export default User;

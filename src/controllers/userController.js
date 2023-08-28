@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import UserRating from '../models/UserRating.js';
+import PasswordToken from '../models/PasswordToken.js';
 import { RequestError } from '../utils/errors.js';
+import nodemailer from 'nodemailer';
 import * as Yup from 'yup';
 import 'express-async-errors';
 
@@ -121,6 +123,68 @@ class UserController {
     }
 
     return res.status(200).json(newRating);
+  }
+
+  async recoverPassword(req, res) {
+    var email = req.body.email;
+
+    const schema = Yup.object().shape({
+      email: Yup.string().email('Formato de email inválido.')
+    });
+
+    await schema.validate({ email });
+
+    //var email = '96.twistedmind.69@gmail.com';
+    var result = await PasswordToken.create(email);
+
+    if (result.status) {
+      let transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com.',
+        port: 465,
+        secure: false,
+        auth: {
+          user: 'pickapal.recover@gmail.com',
+          pass: 'pickapal123456.'
+        }
+      });
+
+      transporter
+        .sendMail({
+          from: 'Pick a Pal <*************>',
+          to: email,
+          subject: 'Recuperação de senha - Pick a Pal',
+          text: 'Clique no link para recuperar sua senha:',
+          //Front End criar página de recuperação de senha e botar o 'link' aqui.
+          html: `<a href="pickapal/passwordrecovery/${result}">Link de Recuperação</a>`
+        })
+        .then(message => {
+          console.log(message);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+      return res.status(200).json({ success: true });
+    } else {
+      return res.status(406).json(result.err);
+    }
+  }
+
+  async changePassword(req, res) {
+    var token = req.body.token;
+    var password = req.body.password;
+
+    var isTokenValid = await PasswordToken.validate(token);
+
+    if (isTokenValid.status) {
+      await User.changePassword(
+        password,
+        isTokenValid.token[0].user_id,
+        isTokenValid.token[0].token
+      );
+      return res.status(200).json('Senha alterada');
+    } else {
+      return res.status(406).json('Token inválido!');
+    }
   }
 }
 
