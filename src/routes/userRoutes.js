@@ -12,5 +12,6 @@ router.patch('/user/:id', auth, userController.update);
 router.get('/user', userController.index);
 router.get('/user/:id', userController.show);
 router.delete('/user/:id', auth, userController.delete);
+router.post('/recoverpassword', userController.recoverPassword);
 
 export default router;

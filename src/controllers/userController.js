@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import PasswordToken from '../models/PasswordToken.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
 import 'express-async-errors';
@@ -75,6 +76,20 @@ class UserController {
     }
     await user.$query().delete();
     return res.json({ message: 'User deleted' });
+  }
+
+  async recoverPassword(req, res) {
+    var email = req.body.email;
+
+    var result = await PasswordToken.create(email);
+    if (result.status) {
+      //MANDAR EMAIL
+      res.status(200);
+      res.send('' + result.token);
+    } else {
+      res.status(406);
+      res.send(result.err);
+    }
   }
 }
 
