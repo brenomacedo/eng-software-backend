@@ -86,11 +86,12 @@ class User extends Model {
   static async findByEmail(email) {
     try {
       const result = await this.query()
-        .select('id', 'email', 'role', 'name') // Seleção específica de colunas
+        .select('id', 'email', 'name') // Seleção específica de colunas
         .findOne({ email });
 
-      if (result.length > 0) {
-        return result[0];
+      if (result !== undefined) {
+        console.log(result.id);
+        return result.id;
       } else {
         return undefined;
       }
