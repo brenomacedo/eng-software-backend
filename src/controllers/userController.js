@@ -81,27 +81,33 @@ class UserController {
 
   async recoverPassword(req, res) {
     var email = req.body.email;
+    //var email = '96.twistedmind.69@gmail.com';
     var result = await PasswordToken.create(email);
 
     if (result.status) {
       //MANDAR EMAIL
-      let transporter = nodemailer.createTransporter({
+
+      let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com.',
-        port: 587,
+        port: 465,
         secure: true,
         auth: {
-          user: 'renanxmarques@alu.ufc.br'
-          //pass: //senha
+          user: 'pickapal.recover@gmail.com',
+          pass: 'pickapal123456'
+        },
+        tls: {
+          ciphers: 'SSLv3'
         }
       });
 
       transporter
         .sendMail({
-          from: 'Pick a Pal <renanxmarques@alu.ufc.br>',
-          to: '96.twistedmint.69',
+          from: 'Pick a Pal <service-pickapal@gmail.com>',
+          to: email,
           subject: 'Recuperação de senha - Pick a Pal',
-          text: 'Clique nesse link para redefinir sua senha: ',
-          html: "<a href: 'teste.com'>"
+          text: 'Clique no link para recuperar sua senha:',
+          //Front End criar página de recuperação de senha e botar o 'link' aqui.
+          html: `<a href="pickapal/passwordrecovery/${result}">Link de Recuperação</a>`
         })
         .then(message => {
           console.log(message);
