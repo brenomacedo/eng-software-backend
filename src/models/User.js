@@ -102,7 +102,6 @@ class User extends Model {
   }
 
   static async changePassword(newPassword, id, token) {
-    console.log('comeco');
     var hash = await bcrypt.hash(newPassword, 10);
     console.log(newPassword);
     console.log(id);
@@ -113,7 +112,6 @@ class User extends Model {
     await user.$query().patch({ password: hash });
     console.log(user);
     await PasswordToken.setUsed(token);
-    console.log('terminou');
   }
 }
 
