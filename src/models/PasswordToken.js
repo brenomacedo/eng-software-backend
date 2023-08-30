@@ -15,7 +15,7 @@ class PasswordToken extends Model {
         id: { type: 'integer' },
         token: { type: 'string', maxLength: 200 },
         user_id: { type: 'integer' },
-        used: { type: 'boolean', default: false }
+        used: { type: 'integer', default: 0 }
       }
     };
   }
@@ -37,10 +37,12 @@ class PasswordToken extends Model {
       try {
         var token = Date.now(); //MUDAR DEPOIS O TIPO DO TOKEN
 
-        PasswordToken.query().insert({
+        console.log(user);
+        // Inserindo token no banco de dados
+        await PasswordToken.query().insert({
           user_id: user.id,
           used: 0,
-          token: token
+          token: String(token)
         });
 
         return { status: true, token: token };
@@ -54,6 +56,36 @@ class PasswordToken extends Model {
         err: 'O e-mail passado não existe no banco de dados'
       };
     }
+  }
+
+  static async validate(token) {
+    try {
+      var result = await PasswordToken.query()
+        .select()
+        .where({ token: token })
+        .table('passwordtokens');
+
+      if (result !== undefined) {
+        var tk = result;
+        console.log(tk);
+        if (tk.used) {
+          return { status: false };
+        } else {
+          return { status: true, token: tk };
+        }
+      } else {
+        return { status: false };
+      }
+    } catch (err) {
+      return { status: false };
+    }
+  }
+
+  static async setUsed(token) {
+    await PasswordToken.query()
+      .update({ used: 1 })
+      .where({ token: token })
+      .table('passwordtokens');
   }
 }
 

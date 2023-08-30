@@ -1,4 +1,5 @@
 import { Model } from 'objection';
+import bcrypt from 'bcryptjs';
 import Category from './Category.js';
 import Event from './Event.js';
 import Request from './Request.js';
@@ -76,13 +77,12 @@ class User extends Model {
 
   static async findByEmail(email) {
     try {
-      const result = await this.query()
+      const result = await User.query()
         .select('id', 'email', 'name') // Seleção específica de colunas
         .findOne({ email });
 
-      if (result !== undefined) {
-        console.log(result.id);
-        return result.id;
+      if (result) {
+        return result;
       } else {
         return undefined;
       }
@@ -90,6 +90,15 @@ class User extends Model {
       console.log(err);
       return undefined;
     }
+  }
+
+  static async changePassword(newPassword, id, token) {
+    var hash = await bcrypt.hash(newPassword, 10);
+    await User.query()
+      .update({ password: hash })
+      .where({ id: id })
+      .table('users');
+    await PasswordToken.setUsed(token);
   }
 }
 
