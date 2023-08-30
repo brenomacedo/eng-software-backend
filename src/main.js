@@ -24,6 +24,6 @@ app.use(API_ENTRYPOINT, requestRoutes);
 
 app.use(errorHandler);
 
-app.listen(3333, () => {
+app.listen(4444, () => {
   console.log('App listening on port 3333');
 });

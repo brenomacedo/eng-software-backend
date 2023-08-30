@@ -60,14 +60,10 @@ class PasswordToken extends Model {
 
   static async validate(token) {
     try {
-      var result = await PasswordToken.query()
-        .select()
-        .where({ token: token })
-        .table('passwordtokens');
+      var result = await PasswordToken.query().select().where({ token: token });
 
       if (result !== undefined) {
         var tk = result;
-        console.log(tk);
         if (tk.used) {
           return { status: false };
         } else {
@@ -82,10 +78,8 @@ class PasswordToken extends Model {
   }
 
   static async setUsed(token) {
-    await PasswordToken.query()
-      .update({ used: 1 })
-      .where({ token: token })
-      .table('passwordtokens');
+    const passwordToken = await PasswordToken.query().findOne({ token: token });
+    await passwordToken.$query().patch({ used: 1 });
   }
 }
 

@@ -197,8 +197,8 @@ class UserController {
     if (isTokenValid.status) {
       await User.changePassword(
         password,
-        isTokenValid.token.user_id,
-        isTokenValid.token.token
+        isTokenValid.token[0].user_id,
+        isTokenValid.token[0].token
       );
       res.status(200);
       res.send('Senha alterada');
