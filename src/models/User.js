@@ -93,12 +93,18 @@ class User extends Model {
   }
 
   static async changePassword(newPassword, id, token) {
+    console.log('comeco');
     var hash = await bcrypt.hash(newPassword, 10);
-    await User.query()
-      .update({ password: hash })
-      .where({ id: id })
-      .table('users');
+    console.log(newPassword);
+    console.log(id);
+    console.log(token);
+
+    // !!!!!!
+    const user = await User.query().findById(id);
+    await user.$query().patch({ password: hash });
+    console.log(user);
     await PasswordToken.setUsed(token);
+    console.log('terminou');
   }
 }
 
