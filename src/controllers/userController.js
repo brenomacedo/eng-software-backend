@@ -92,8 +92,8 @@ class UserController {
         port: 465,
         secure: true,
         auth: {
-          user: 'pickapal.recover@gmail.com',
-          pass: 'pickapal123456'
+          user: '***********',
+          pass: '***********'
         },
         tls: {
           ciphers: 'SSLv3'
@@ -102,7 +102,7 @@ class UserController {
 
       transporter
         .sendMail({
-          from: 'Pick a Pal <service-pickapal@gmail.com>',
+          from: 'Pick a Pal <*************>',
           to: email,
           subject: 'Recuperação de senha - Pick a Pal',
           text: 'Clique no link para recuperar sua senha:',
