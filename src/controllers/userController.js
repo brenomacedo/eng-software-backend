@@ -128,7 +128,6 @@ class UserController {
 
   async recoverPassword(req, res) {
     var email = req.body.email;
-<<<<<<< HEAD
 
     const schema = Yup.object().shape({
       email: Yup.string().email('Formato de email inválido.')
@@ -136,13 +135,10 @@ class UserController {
 
     await schema.validate({ email });
 
-=======
->>>>>>> 612cd99 (Rota de passowordRecover funcionando perfeitamente (ver a questão do email). Falta alterar de fato a senha no banco de dados depois de validar)
     //var email = '96.twistedmind.69@gmail.com';
     var result = await PasswordToken.create(email);
 
     if (result.status) {
-<<<<<<< HEAD
       let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com.',
         port: 465,
@@ -150,30 +146,12 @@ class UserController {
         auth: {
           user: 'pickapal.recover@gmail.com',
           pass: 'pickapal123456.'
-=======
-      //MANDAR EMAIL
-
-      let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com.',
-        port: 465,
-        secure: true,
-        auth: {
-          user: 'pickapal.recover@gmail.com',
-          pass: 'pickapal123456'
-        },
-        tls: {
-          ciphers: 'SSLv3'
->>>>>>> 612cd99 (Rota de passowordRecover funcionando perfeitamente (ver a questão do email). Falta alterar de fato a senha no banco de dados depois de validar)
         }
       });
 
       transporter
         .sendMail({
-<<<<<<< HEAD
           from: 'Pick a Pal <*************>',
-=======
-          from: 'Pick a Pal <service-pickapal@gmail.com>',
->>>>>>> 612cd99 (Rota de passowordRecover funcionando perfeitamente (ver a questão do email). Falta alterar de fato a senha no banco de dados depois de validar)
           to: email,
           subject: 'Recuperação de senha - Pick a Pal',
           text: 'Clique no link para recuperar sua senha:',
@@ -207,6 +185,27 @@ class UserController {
       return res.status(200).json('Senha alterada');
     } else {
       return res.status(406).json('Token inválido!');
+    }
+  }
+
+  async changePassword(req, res) {
+    var token = req.body.token;
+    var password = req.body.password;
+
+    var isTokenValid = await PasswordToken.validate(token);
+
+    if (isTokenValid.status) {
+      await User.changePassword(
+        password,
+        isTokenValid.token.user_id,
+        isTokenValid.token.token
+      );
+      res.status(200);
+      res.send('Senha alterada');
+      // alterar senha
+    } else {
+      res.status(406);
+      res.send('Token inválido!');
     }
   }
 }
