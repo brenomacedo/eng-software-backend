@@ -81,7 +81,7 @@ class AuthController {
       {
         id: user.id
       },
-      'abdc',
+      process.env.JWT_KEY,
       { expiresIn: '10d' }
     );
 
