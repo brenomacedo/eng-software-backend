@@ -5,7 +5,7 @@ import { RequestError } from '../utils/errors.js';
 import nodemailer from 'nodemailer';
 import * as Yup from 'yup';
 import 'express-async-errors';
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 
 class UserController {
   // Receive a request and a response.
@@ -185,27 +185,6 @@ class UserController {
       return res.status(200).json('Senha alterada');
     } else {
       return res.status(406).json('Token inválido!');
-    }
-  }
-
-  async changePassword(req, res) {
-    var token = req.body.token;
-    var password = req.body.password;
-
-    var isTokenValid = await PasswordToken.validate(token);
-
-    if (isTokenValid.status) {
-      await User.changePassword(
-        password,
-        isTokenValid.token[0].user_id,
-        isTokenValid.token[0].token
-      );
-      res.status(200);
-      res.send('Senha alterada');
-      // alterar senha
-    } else {
-      res.status(406);
-      res.send('Token inválido!');
     }
   }
 }
