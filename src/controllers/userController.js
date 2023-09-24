@@ -9,7 +9,7 @@ class UserController {
   // Update: edit the user
   async update(req, res) {
     const { id } = req.params;
-    const { name, email, description, birth_date } = req.body;
+    const { name, email, description, birth_date, profile_pic } = req.body;
 
     if (req.userId !== Number(id)) {
       throw new RequestError('Operação não autorizada.', 403);
@@ -32,7 +32,9 @@ class UserController {
       throw new RequestError('Usuário não encontrado', 404);
     }
 
-    await user.$query().patch({ name, email, description, birth_date });
+    await user
+      .$query()
+      .patch({ name, email, description, birth_date, profile_pic });
 
     delete user.password;
     return res.json(user);
