@@ -20,7 +20,7 @@ class User extends Model {
         birth_date: { type: 'string' },
         description: { type: 'string' },
         email: { type: 'string' },
-        profile_pic: { type: 'string' },
+        profile_pic: { type: 'integer' },
         is_premium: { type: 'boolean' }
       }
     };
