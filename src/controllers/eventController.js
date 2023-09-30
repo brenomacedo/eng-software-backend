@@ -100,7 +100,11 @@ class EventController {
     if (user_id) {
       events = await Event.query().whereNot({ user_id });
     } else {
-      events = await Event.query();
+      events = await Event.query().withGraphFetched({
+        requests: {
+          user: true
+        }
+      });
     }
 
     const nearestEvents = events.filter(event => {
@@ -113,6 +117,12 @@ class EventController {
 
       return distanceThreshold < distance;
     });
+
+    for (let i = 0; i < nearestEvents.length; ++i) {
+      for (let j = 0; j < nearestEvents[i].requests.length; ++j) {
+        delete nearestEvents[i].requests[j].user.password;
+      }
+    }
 
     return res.status(200).json(nearestEvents);
   }
@@ -147,8 +157,6 @@ class EventController {
     } = req.body;
     const id = Number(req.params.id);
     const userId = req.userId;
-
-    console.log(title)
 
     const schema = Yup.object().shape({
       title: Yup.string('Formato do título inválido'),
@@ -209,16 +217,19 @@ class EventController {
   async search(req, res) {
     const title = req.params.title;
     const userId = Number(req.params.userId);
-    const eventsFound = await Event.query().select('*').where('title', 'ilike', `%${title}%`).where('user_id','!=',userId);
+    const eventsFound = await Event.query()
+      .select('*')
+      .where('title', 'ilike', `%${title}%`)
+      .where('user_id', '!=', userId);
 
     return res.status(200).json(eventsFound);
   }
 
   async searchAll(req, res) {
     const title = req.params.title;
-    const eventsFound = await Event.query().select('*').where('title', 'ilike', `%${title}%`);
-
-    
+    const eventsFound = await Event.query()
+      .select('*')
+      .where('title', 'ilike', `%${title}%`);
 
     return res.status(200).json(eventsFound);
   }
