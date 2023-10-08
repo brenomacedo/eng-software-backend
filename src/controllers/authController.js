@@ -68,7 +68,7 @@ class AuthController {
       description,
       birth_date,
       is_premium: false,
-      profile_pic: '',
+      profile_pic: 0,
       password: passwordHash
     });
     delete user.password;

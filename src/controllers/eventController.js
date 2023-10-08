@@ -77,10 +77,10 @@ class EventController {
   }
 
   async indexNearestEvents(req, res) {
-    const user_id = req.userId;
     const distance = req.query.distance;
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
+    const title = req.query.title;
 
     const schema = Yup.object().shape({
       distance: Yup.number('Formato do número inválido').required(
@@ -91,21 +91,22 @@ class EventController {
       ),
       longitude: Yup.number('Formato da longitude inválida').required(
         'A longitude é obrigatória'
-      )
+      ),
+      title: Yup.string('Formato do título do evento inválido')
     });
-    await schema.validate({ distance, latitude, longitude });
+    await schema.validate({ distance, latitude, longitude, title });
 
-    let events;
-
-    if (user_id) {
-      events = await Event.query().whereNot({ user_id });
-    } else {
-      events = await Event.query().withGraphFetched({
-        requests: {
-          user: true
-        }
-      });
+    let eventsQuery = Event.query();
+    if (title) {
+      eventsQuery = eventsQuery.where('title', 'ilike', `%${title}%`);
     }
+
+    const events = await eventsQuery.withGraphFetched({
+      requests: {
+        user: true
+      },
+      user: true
+    });
 
     const nearestEvents = events.filter(event => {
       const distanceThreshold = DistanceCalculator.getDistanceFromLatLonInKm(
@@ -119,6 +120,7 @@ class EventController {
     });
 
     for (let i = 0; i < nearestEvents.length; ++i) {
+      delete nearestEvents[i].user.password;
       for (let j = 0; j < nearestEvents[i].requests.length; ++j) {
         delete nearestEvents[i].requests[j].user.password;
       }
@@ -134,10 +136,12 @@ class EventController {
       .withGraphFetched({
         requests: {
           user: true
-        }
+        },
+        user: true
       });
 
     for (const eventKey in events) {
+      delete events[eventKey].user.password;
       for (const requestKey in events[eventKey].requests) {
         delete events[eventKey].requests[requestKey].user.password;
       }
@@ -215,7 +219,7 @@ class EventController {
   }
 
   async search(req, res) {
-    const title = req.params.title;
+    const title = req.query.title;
     const userId = Number(req.params.userId);
     const eventsFound = await Event.query()
       .select('*')
@@ -226,7 +230,7 @@ class EventController {
   }
 
   async searchAll(req, res) {
-    const title = req.params.title;
+    const title = req.query.title;
     const eventsFound = await Event.query()
       .select('*')
       .where('title', 'ilike', `%${title}%`);
