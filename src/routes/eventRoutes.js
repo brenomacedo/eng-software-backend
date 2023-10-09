@@ -9,6 +9,7 @@ router.post('/event/rate', auth, eventController.rateEvent);
 router.get('/event/me', auth, eventController.indexUserEvents);
 router.get('/event/all', eventController.indexNearestEvents);
 router.get('/event', auth, eventController.indexNearestEvents);
+router.get('/event/:id', eventController.show);
 router.patch('/event/:id', auth, eventController.update);
 router.delete('/event/:id', auth, eventController.delete);
 

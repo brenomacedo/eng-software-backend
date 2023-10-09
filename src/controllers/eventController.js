@@ -280,6 +280,21 @@ class EventController {
 
     return res.status(200).json(newRating);
   }
+
+  async show(req, res) {
+    const { id } = req.params;
+    const event = await Event.query().findById(id).withGraphFetched({
+      user: true,
+      ratings: true
+    });
+    if (!event) {
+      throw new RequestError('Evento não encontrado', 404);
+    }
+
+    delete event.user.password;
+
+    return res.json(event);
+  }
 }
 
 export default new EventController();
