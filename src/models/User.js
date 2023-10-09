@@ -3,6 +3,7 @@ import Category from './Category.js';
 import Event from './Event.js';
 import Request from './Request.js';
 import Address from './Address.js';
+import UserRating from './UserRating.js';
 
 class User extends Model {
   static get tableName() {
@@ -62,6 +63,14 @@ class User extends Model {
         from: 'users.id',
         to: 'addresses.user_id'
       }
+    },
+    ratings: {
+      join: {
+        from: 'users.id',
+        to: 'user_ratings.user_rated'
+      },
+      relation: Model.HasManyRelation,
+      modelClass: UserRating
     }
   });
 }

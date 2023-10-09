@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import UserRating from '../models/UserRating.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
 import 'express-async-errors';
@@ -54,7 +55,14 @@ class UserController {
   // Show: show a single user by ID
   async show(req, res) {
     const { id } = req.params;
-    const user = await User.query().findById(id);
+    const user = await User.query()
+      .findById(id)
+      .withGraphFetched({
+        ratings: true,
+        events: {
+          ratings: true
+        }
+      });
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);
     }
@@ -77,6 +85,42 @@ class UserController {
     }
     await user.$query().delete();
     return res.json({ message: 'User deleted' });
+  }
+
+  async rateUser(req, res) {
+    const { rating, user_rated } = req.body;
+    const user_id = req.userId;
+
+    const schema = Yup.object().shape({
+      rating: Yup.number('Formato da avaliação inválida!').required(
+        'A avaliação é obrigatória!'
+      ),
+      user_rated: Yup.number('Formato do usuário avaliado inválido!').required(
+        'O usuário avaliado é obrigatório!'
+      )
+    });
+
+    await schema.validate({ rating, user_rated });
+
+    const foundRating = await UserRating.query().findOne({
+      user_id,
+      user_rated
+    });
+    let newRating;
+
+    if (foundRating) {
+      newRating = await UserRating.query().patchAndFetchById(foundRating.id, {
+        rating
+      });
+    } else {
+      newRating = await UserRating.query().insertAndFetch({
+        user_id,
+        user_rated,
+        rating
+      });
+    }
+
+    return res.status(200).json(newRating);
   }
 }
 

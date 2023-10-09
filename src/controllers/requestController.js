@@ -76,9 +76,19 @@ class RequestController {
   async searchRequests(req, res) {
     const userId = Number(req.userId);
     const userRequests = await Request.query()
-      .select('*')
-      .joinRelated('event')
-      .where('requests.user_id', userId);
+      .where({ user_id: userId })
+      .withGraphFetched({
+        event: {
+          user: true,
+          requests: {
+            user: true
+          }
+        }
+      });
+
+    for (const i in userRequests) {
+      delete userRequests[i].event.user.password;
+    }
     //console.log(userRequests)
     return res.status(200).json(userRequests);
   }
@@ -87,9 +97,15 @@ class RequestController {
     const eventId = Number(req.params.id);
     //const userId = Number(req.userId);
     const requests = await Request.query()
-      .select('requests.id', 'message', 'name', 'status')
-      .joinRelated('user')
-      .where('requests.event_id', eventId);
+      .where({ event_id: eventId })
+      .withGraphFetched({
+        user: true
+      });
+
+    for (const i in requests) {
+      delete requests[i].user.password;
+    }
+
     return res.status(200).json(requests);
   }
 }

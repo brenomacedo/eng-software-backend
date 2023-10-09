@@ -1,6 +1,7 @@
 import { Model } from 'objection';
 import User from './User.js';
 import Request from './Request.js';
+import EventRating from './EventRating.js';
 
 class Event extends Model {
   static get tableName() {
@@ -49,6 +50,14 @@ class Event extends Model {
         to: 'requests.event_id'
       },
       modelClass: Request,
+      relation: Model.HasManyRelation
+    },
+    ratings: {
+      join: {
+        from: 'events.id',
+        to: 'event_ratings.event_rated'
+      },
+      modelClass: EventRating,
       relation: Model.HasManyRelation
     }
   });

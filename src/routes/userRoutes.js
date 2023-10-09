@@ -8,9 +8,10 @@ const router = new Router();
 router.post('/auth', auth, authController.auth);
 router.post('/user/signup', authController.signup);
 router.post('/user/login', authController.login);
+router.post('/user/rate', auth, userController.rateUser);
 router.patch('/user/:id', auth, userController.update);
-router.get('/user', userController.index);
 router.get('/user/:id', userController.show);
 router.delete('/user/:id', auth, userController.delete);
+router.get('/user', userController.index);
 
 export default router;

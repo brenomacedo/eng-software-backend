@@ -1,6 +1,7 @@
 import Event from '../models/Event.js';
 import { RequestError } from '../utils/errors.js';
 import * as Yup from 'yup';
+import EventRating from '../models/EventRating.js';
 import 'express-async-errors';
 
 class DistanceCalculator {
@@ -105,7 +106,10 @@ class EventController {
       requests: {
         user: true
       },
-      user: true
+      user: {
+        ratings: true
+      },
+      ratings: true
     });
 
     const nearestEvents = events.filter(event => {
@@ -137,7 +141,10 @@ class EventController {
         requests: {
           user: true
         },
-        user: true
+        user: {
+          ratings: true
+        },
+        ratings: true
       });
 
     for (const eventKey in events) {
@@ -236,6 +243,42 @@ class EventController {
       .where('title', 'ilike', `%${title}%`);
 
     return res.status(200).json(eventsFound);
+  }
+
+  async rateEvent(req, res) {
+    const { rating, event_rated } = req.body;
+    const user_id = req.userId;
+
+    const schema = Yup.object().shape({
+      rating: Yup.number('Formato da avaliação inválida!').required(
+        'A avaliação é obrigatória!'
+      ),
+      event_rated: Yup.number('Formato do evento avaliado inválido!').required(
+        'O usuário avaliado é obrigatório!'
+      )
+    });
+
+    await schema.validate({ rating, event_rated });
+
+    const foundRating = await EventRating.query().findOne({
+      user_id,
+      event_rated
+    });
+    let newRating;
+
+    if (foundRating) {
+      newRating = await EventRating.query().patchAndFetchById(foundRating.id, {
+        rating
+      });
+    } else {
+      newRating = await EventRating.query().insertAndFetch({
+        user_id,
+        event_rated,
+        rating
+      });
+    }
+
+    return res.status(200).json(newRating);
   }
 }
 
