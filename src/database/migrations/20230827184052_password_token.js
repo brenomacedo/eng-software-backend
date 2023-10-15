@@ -15,6 +15,7 @@ export function up(knex) {
     table.index('token');
 
     table.tinyint('used').unsigned().notNullable().defaultTo(0);
+    table.timestamps(true, true);
   });
 }
 

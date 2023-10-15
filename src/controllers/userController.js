@@ -4,8 +4,13 @@ import PasswordToken from '../models/PasswordToken.js';
 import { RequestError } from '../utils/errors.js';
 import nodemailer from 'nodemailer';
 import * as Yup from 'yup';
+import handlebars from 'handlebars';
+import fs from 'fs';
 import 'express-async-errors';
-// import nodemailer from 'nodemailer';
+
+import * as url from 'url';
+import path from 'path';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 class UserController {
   // Receive a request and a response.
@@ -127,7 +132,12 @@ class UserController {
   }
 
   async recoverPassword(req, res) {
-    var email = req.body.email;
+    const email = req.body.email;
+    const emailTemplate = fs.readFileSync(
+      path.resolve(__dirname, '..', 'views', 'email.handlebars')
+    );
+    const template = handlebars.compile(emailTemplate.toString());
+    const html = template();
 
     const schema = Yup.object().shape({
       email: Yup.string().email('Formato de email inválido.')
@@ -141,22 +151,21 @@ class UserController {
     if (result.status) {
       let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com.',
-        port: 465,
+        port: 587,
         secure: false,
         auth: {
-          user: 'pickapal.recover@gmail.com',
-          pass: 'pickapal123456.'
+          user: 'brenomacedo.pokemon@gmail.com',
+          pass: 'pjgokumverefyptc'
         }
       });
 
-      transporter
+      await transporter
         .sendMail({
-          from: 'Pick a Pal <*************>',
+          from: 'Pick a Pal <breno@pickapal.com',
           to: email,
           subject: 'Recuperação de senha - Pick a Pal',
           text: 'Clique no link para recuperar sua senha:',
-          //Front End criar página de recuperação de senha e botar o 'link' aqui.
-          html: `<a href="pickapal/passwordrecovery/${result}">Link de Recuperação</a>`
+          html
         })
         .then(message => {
           console.log(message);
