@@ -36,8 +36,6 @@ class PasswordToken extends Model {
     if (user != undefined) {
       try {
         var token = Date.now(); //MUDAR DEPOIS O TIPO DO TOKEN
-
-        console.log(user);
         // Inserindo token no banco de dados
         await PasswordToken.query().insert({
           user_id: user.id,
@@ -45,7 +43,7 @@ class PasswordToken extends Model {
           token: String(token)
         });
 
-        return { status: true, token: token };
+        return { status: true, token: token, user };
       } catch (err) {
         console.log(err);
         return { status: false, err: err };

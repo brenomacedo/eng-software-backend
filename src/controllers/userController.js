@@ -7,10 +7,12 @@ import * as Yup from 'yup';
 import handlebars from 'handlebars';
 import fs from 'fs';
 import 'express-async-errors';
-
+import dotenv from 'dotenv';
 import * as url from 'url';
 import path from 'path';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
+dotenv.config();
 
 class UserController {
   // Receive a request and a response.
@@ -136,17 +138,22 @@ class UserController {
     const emailTemplate = fs.readFileSync(
       path.resolve(__dirname, '..', 'views', 'email.handlebars')
     );
+
+    console.log(process.env.EMAIL);
+    console.log(process.env.EMAIL_PASSWORD);
+    //var email = '96.twistedmind.69@gmail.com';
+    var result = await PasswordToken.create(email);
+
+    const userName = result.user ? result.user.name.split(' ')[0] : '';
+
     const template = handlebars.compile(emailTemplate.toString());
-    const html = template();
+    const html = template({ user: userName });
 
     const schema = Yup.object().shape({
       email: Yup.string().email('Formato de email inválido.')
     });
 
     await schema.validate({ email });
-
-    //var email = '96.twistedmind.69@gmail.com';
-    var result = await PasswordToken.create(email);
 
     if (result.status) {
       let transporter = nodemailer.createTransport({
@@ -175,7 +182,7 @@ class UserController {
         });
       return res.status(200).json({ success: true });
     } else {
-      return res.status(406).json(result.err);
+      return res.status(200).json({ success: true });
     }
   }
 

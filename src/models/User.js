@@ -103,9 +103,6 @@ class User extends Model {
 
   static async changePassword(newPassword, id, token) {
     var hash = await bcrypt.hash(newPassword, 10);
-    console.log(newPassword);
-    console.log(id);
-    console.log(token);
 
     // !!!!!!
     const user = await User.query().findById(id);
