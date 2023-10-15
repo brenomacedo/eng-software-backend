@@ -104,7 +104,9 @@ class EventController {
 
     const events = await eventsQuery.withGraphFetched({
       requests: {
-        user: true
+        user: {
+          ratings: true
+        }
       },
       user: {
         ratings: true
@@ -139,7 +141,9 @@ class EventController {
       .where({ user_id: userId })
       .withGraphFetched({
         requests: {
-          user: true
+          user: {
+            ratings: true
+          }
         },
         user: {
           ratings: true
@@ -283,10 +287,13 @@ class EventController {
 
   async show(req, res) {
     const { id } = req.params;
-    const event = await Event.query().findById(id).withGraphFetched({
-      user: true,
-      ratings: true
-    });
+    const event = await Event.query()
+      .findById(id)
+      .withGraphFetched({
+        user: { ratings: true },
+        ratings: true,
+        requests: { user: { ratings: true } }
+      });
     if (!event) {
       throw new RequestError('Evento não encontrado', 404);
     }
