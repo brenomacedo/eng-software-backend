@@ -139,15 +139,14 @@ class UserController {
       path.resolve(__dirname, '..', 'views', 'email.handlebars')
     );
 
-    console.log(process.env.EMAIL);
-    console.log(process.env.EMAIL_PASSWORD);
     //var email = '96.twistedmind.69@gmail.com';
     var result = await PasswordToken.create(email);
 
     const userName = result.user ? result.user.name.split(' ')[0] : '';
+    const token = result.token || '';
 
     const template = handlebars.compile(emailTemplate.toString());
-    const html = template({ user: userName });
+    const html = template({ user: userName, token });
 
     const schema = Yup.object().shape({
       email: Yup.string().email('Formato de email inválido.')
@@ -161,8 +160,8 @@ class UserController {
         port: 587,
         secure: false,
         auth: {
-          user: 'brenomacedo.pokemon@gmail.com',
-          pass: 'pjgokumverefyptc'
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD
         }
       });
 
