@@ -8,8 +8,16 @@ export function up(knex) {
     table.integer('rating').notNullable();
     table.integer('user_id').notNullable();
     table.integer('event_rated').notNullable();
-    table.foreign('user_id').references('users.id');
-    table.foreign('event_rated').references('events.id');
+    table
+      .foreign('user_id')
+      .references('users.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE');
+    table
+      .foreign('event_rated')
+      .references('events.id')
+      .onDelete('CASCADE')
+      .onUpdate('CASCADE');
   });
 }
 

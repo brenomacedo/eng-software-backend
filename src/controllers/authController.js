@@ -101,7 +101,9 @@ class AuthController {
         preferences: true,
         events: true,
         requests: true,
-        address: true
+        address: true,
+        comments: true,
+        comments_made: true
       });
 
     //if found someone, it will check if the password is matching

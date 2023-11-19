@@ -71,10 +71,15 @@ class UserController {
         ratings: true,
         events: {
           ratings: true
-        }
+        },
+        comments: { user: true }
       });
     if (!user) {
       throw new RequestError('Usuário não encontrado', 404);
+    }
+
+    for (const comment of user.comments) {
+      delete comment.user.password;
     }
 
     delete user.password;

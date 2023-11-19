@@ -2,6 +2,7 @@ import { Router } from 'express';
 import userController from '../controllers/userController.js';
 import authController from '../controllers/authController.js';
 import auth from '../middlewares/auth.js';
+import commentController from '../controllers/commentController.js';
 
 const router = new Router();
 
@@ -15,5 +16,7 @@ router.delete('/user/:id', auth, userController.delete);
 router.get('/user', userController.index);
 router.post('/recoverpassword', userController.recoverPassword);
 router.post('/changepassword', userController.changePassword);
+router.post('/comment/:id', auth, commentController.create);
+router.delete('/comment/:id', auth, commentController.delete);
 
 export default router;

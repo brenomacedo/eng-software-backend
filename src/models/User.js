@@ -6,6 +6,7 @@ import Request from './Request.js';
 import Address from './Address.js';
 import UserRating from './UserRating.js';
 import PasswordToken from './PasswordToken.js';
+import UserComment from './UserComment.js';
 
 class User extends Model {
   static get tableName() {
@@ -80,6 +81,22 @@ class User extends Model {
       join: {
         from: 'users.id',
         to: 'passwordtokens.user_id'
+      }
+    },
+    comments: {
+      relation: Model.HasManyRelation,
+      modelClass: UserComment,
+      join: {
+        from: 'users.id',
+        to: 'user_comments.user_id'
+      }
+    },
+    comments_made: {
+      relation: Model.HasManyRelation,
+      modelClass: UserComment,
+      join: {
+        from: 'users.id',
+        to: 'user_comments.author_id'
       }
     }
   });
