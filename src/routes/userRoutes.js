@@ -18,5 +18,6 @@ router.post('/recoverpassword', userController.recoverPassword);
 router.post('/changepassword', userController.changePassword);
 router.post('/comment/:id', auth, commentController.create);
 router.delete('/comment/:id', auth, commentController.delete);
+router.get('/comment/:id', commentController.index);
 
 export default router;

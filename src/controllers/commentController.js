@@ -45,6 +45,23 @@ class CommentController {
 
     return res.status(200).json({ deleted: true });
   }
+
+  async index(req, res) {
+    const userId = Number(req.params.id);
+    const page = req.body.page;
+
+    const schema = Yup.object().shape({
+      page: Yup.number('Formato da página inválido!').required()
+    });
+    await schema.validate({ page });
+
+    const comments = await UserComment.query()
+      .where({ userId })
+      .offset(page * 5)
+      .limit(5);
+
+    return res.status(200).json(comments);
+  }
 }
 
 export default new CommentController();
