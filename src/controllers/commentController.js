@@ -48,7 +48,7 @@ class CommentController {
 
   async index(req, res) {
     const userId = Number(req.params.id);
-    const page = req.body.page;
+    const page = req.query.page;
 
     const schema = Yup.object().shape({
       page: Yup.number('Formato da página inválido!').required()
@@ -56,7 +56,8 @@ class CommentController {
     await schema.validate({ page });
 
     const comments = await UserComment.query()
-      .where({ userId })
+      .where({ user_id: userId })
+      .withGraphFetched({ author: true })
       .offset(page * 5)
       .limit(5);
 
