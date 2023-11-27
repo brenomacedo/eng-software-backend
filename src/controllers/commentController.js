@@ -22,15 +22,20 @@ class CommentController {
     if (userComment) {
       comment = await userComment
         .$query()
-        .patchAndFetch({ content, edited: true });
+        .patchAndFetch({ content, edited: true })
+        .withGraphFetched({ author: true });
     } else {
-      comment = await UserComment.query().insertAndFetch({
-        content,
-        user_id: userId,
-        author_id: authorId,
-        edited: false
-      });
+      comment = await UserComment.query()
+        .insertAndFetch({
+          content,
+          user_id: userId,
+          author_id: authorId,
+          edited: false
+        })
+        .withGraphFetched({ author: true });
     }
+
+    delete comment.author.password;
 
     return res.status(201).json(comment);
   }
@@ -49,6 +54,7 @@ class CommentController {
   async index(req, res) {
     const userId = Number(req.params.id);
     const page = req.query.page;
+    const authorId = req.query.authorId;
 
     const schema = Yup.object().shape({
       page: Yup.number('Formato da página inválido!').required()
@@ -57,9 +63,24 @@ class CommentController {
 
     const comments = await UserComment.query()
       .where({ user_id: userId })
+      .whereNot({ author_id: authorId })
       .withGraphFetched({ author: true })
       .offset(page * 5)
       .limit(5);
+
+    for (const comment of comments) {
+      delete comment.author.password;
+    }
+
+    if (Number(page) === 0) {
+      const userComment = await UserComment.query()
+        .findOne({ author_id: authorId })
+        .withGraphFetched({ author: true });
+
+      if (userComment) {
+        comments.push(userComment);
+      }
+    }
 
     return res.status(200).json(comments);
   }
