@@ -74,7 +74,7 @@ class CommentController {
 
     if (Number(page) === 0) {
       const userComment = await UserComment.query()
-        .findOne({ author_id: authorId })
+        .findOne({ author_id: authorId, user_id: userId })
         .withGraphFetched({ author: true });
 
       if (userComment) {
