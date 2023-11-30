@@ -63,7 +63,7 @@ class CommentController {
 
     const comments = await UserComment.query()
       .where({ user_id: userId })
-      .whereNot({ author_id: authorId })
+      .whereNot({ author_id: authorId || 0 })
       .withGraphFetched({ author: true })
       .offset(page * 5)
       .limit(5);
@@ -72,7 +72,7 @@ class CommentController {
       delete comment.author.password;
     }
 
-    if (Number(page) === 0) {
+    if (Number(page) === 0 && authorId) {
       const userComment = await UserComment.query()
         .findOne({ author_id: authorId, user_id: userId })
         .withGraphFetched({ author: true });
